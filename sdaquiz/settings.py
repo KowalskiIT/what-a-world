@@ -23,7 +23,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECRET_KEY = 'dwzmt3aan4s288x5suasjyc*_7-pmx8f5sp6w0_c939!t85sx('
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['quiz-python.sdacademy.xyz', 'app.quiz.pp.python.pl.sdacademy.xyz', '127.0.0.1']
 
