@@ -1,4 +1,3 @@
-from html import unescape
 from django.shortcuts import render, redirect
 from .api import ApiClient
 from .game import Quiz
@@ -32,7 +31,6 @@ def on_game(request):
 
     try:
         question = quiz.get_question()
-        question.question = unescape(question.question)
         quiz.save(request)
         print(question)
         return render(request, 'game.html', vars(question))

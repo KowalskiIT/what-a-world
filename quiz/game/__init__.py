@@ -2,6 +2,7 @@ from ..api import ApiClient
 from typing import List
 from dataclasses import dataclass, field
 from random import shuffle
+from html import unescape
 import logging as log
 
 
@@ -22,6 +23,7 @@ class Question:
         self.answers.extend(self.incorrect_answers)
         self.answers.append(self.correct_answer)
         shuffle(self.answers)
+        self.question = unescape(self.question)
 
 
 @dataclass
