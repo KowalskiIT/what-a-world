@@ -16,14 +16,14 @@ class Question:
     incorrect_answers: List[str]
     answers: List[str] = field(default_factory=list, init=False)
 
-    def check_answer(self, answer: str):
-        return answer == self.correct_answer
-
     def __post_init__(self):
         self.answers.extend(self.incorrect_answers)
         self.answers.append(self.correct_answer)
         shuffle(self.answers)
         self.question = unescape(self.question)
+
+    def check_answer(self, answer: str):
+        return answer == self.correct_answer
 
 
 @dataclass
@@ -60,7 +60,7 @@ class Quiz:
     def check_answer(self, answer):
         if answer:
             self.just_started = False
-        if self.questions[self.current_question - 1].correct_answer == answer:
+        if self.questions[self.current_question].correct_answer == answer:
             self.number_of_correct_answers += 1
 
     def get_result(self):
