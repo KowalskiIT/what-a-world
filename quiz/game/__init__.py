@@ -37,7 +37,12 @@ class Quiz:
 
     @classmethod
     def create_game(cls, number_of_questions, difficulty, category):
-        raw_questions = ApiClient.get_questions(difficulty, number_of_questions, category)
+        available_question_number = ApiClient.get_questions_amount(category, difficulty)
+
+        if int(number_of_questions) <= available_question_number:
+            raw_questions = ApiClient.get_questions(difficulty, number_of_questions, category)
+        else:
+            raw_questions = ApiClient.get_questions(difficulty, available_question_number, category)
         questions = list([Question(**raw_question) for raw_question in raw_questions])
         return Quiz(number_of_questions, difficulty, questions, 0, 0)
 
@@ -66,5 +71,5 @@ class Quiz:
     def get_result(self):
         return {
             'correct_answers': self.number_of_correct_answers,
-            'all_questions': self.number_of_questions
+            'all_questions': len(self.questions)
         }
