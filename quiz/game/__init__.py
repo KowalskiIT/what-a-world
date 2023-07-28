@@ -33,6 +33,7 @@ class Quiz:
     questions: List[Question]
     current_question: int
     number_of_correct_answers: int
+    just_started: bool = True
 
     @classmethod
     def create_game(cls, number_of_questions, difficulty, category):
@@ -51,11 +52,14 @@ class Quiz:
         return request.session.get('saved_quiz')
 
     def get_question(self):
+        if not self.just_started:
+            self.current_question += 1
         question = self.questions[self.current_question]
-        self.current_question += 1
         return question
 
     def check_answer(self, answer):
+        if answer:
+            self.just_started = False
         if self.questions[self.current_question - 1].correct_answer == answer:
             self.number_of_correct_answers += 1
 
