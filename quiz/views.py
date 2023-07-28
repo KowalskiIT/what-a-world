@@ -28,11 +28,10 @@ def on_game(request):
     answer = request.POST.get('answer')
     if answer:
         quiz.check_answer(answer)
+        quiz.save(request)
 
     try:
         question = quiz.get_question()
-        quiz.save(request)
-        print(question)
         return render(request, 'game.html', vars(question))
     except IndexError as x:
         return redirect('/finish')
@@ -40,6 +39,6 @@ def on_game(request):
 
 def finish(request):
     quiz = Quiz.restore(request)
-    result = quiz.get_result()
-    quiz.stop(request)
+    if quiz:
+        result = quiz.get_result()
     return render(request, 'finish.html', result)

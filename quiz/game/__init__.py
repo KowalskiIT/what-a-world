@@ -16,14 +16,14 @@ class Question:
     incorrect_answers: List[str]
     answers: List[str] = field(default_factory=list, init=False)
 
-    def check_answer(self, answer: str):
-        return answer == self.correct_answer
-
     def __post_init__(self):
         self.answers.extend(self.incorrect_answers)
         self.answers.append(self.correct_answer)
         shuffle(self.answers)
         self.question = unescape(self.question)
+
+    def check_answer(self, answer: str):
+        return answer == self.correct_answer
 
 
 @dataclass
@@ -33,10 +33,16 @@ class Quiz:
     questions: List[Question]
     current_question: int
     number_of_correct_answers: int
+    just_started: bool = True
 
     @classmethod
     def create_game(cls, number_of_questions, difficulty, category):
-        raw_questions = ApiClient.get_questions(difficulty, number_of_questions, category)
+        available_question_number = ApiClient.get_questions_amount(category, difficulty)
+
+        if int(number_of_questions) <= available_question_number:
+            raw_questions = ApiClient.get_questions(difficulty, number_of_questions, category)
+        else:
+            raw_questions = ApiClient.get_questions(difficulty, available_question_number, category)
         questions = list([Question(**raw_question) for raw_question in raw_questions])
         return Quiz(number_of_questions, difficulty, questions, 0, 0)
 
@@ -51,16 +57,19 @@ class Quiz:
         return request.session.get('saved_quiz')
 
     def get_question(self):
+        if not self.just_started:
+            self.current_question += 1
         question = self.questions[self.current_question]
-        self.current_question += 1
         return question
 
     def check_answer(self, answer):
-        if self.questions[self.current_question - 1].correct_answer == answer:
+        if answer:
+            self.just_started = False
+        if self.questions[self.current_question].correct_answer == answer:
             self.number_of_correct_answers += 1
 
     def get_result(self):
         return {
             'correct_answers': self.number_of_correct_answers,
-            'all_questions': self.number_of_questions
+            'all_questions': len(self.questions)
         }
